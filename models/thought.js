@@ -1,5 +1,41 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types } = require('mongoose');
 const dateFormat = require("../utils/dateFormat");
+
+const reactionSchema = new Schema(
+    {
+      reactionId: {
+        // Mongoose's ObjectId data type
+        type: Schema.Types.ObjectId,
+        // Default value is set to a new ObjectId
+        default: () => new Types.ObjectId(),
+      },
+  
+      reactionBody: {
+        type: String,
+        required: true,
+        maxlength: 280,
+      },
+  
+      username: {
+        type: String,
+        required: true,
+      },
+  
+      createdAt: {
+        type: Date,
+        // Set default value to the current timestamp
+        default: Date.now,
+        // Use a getter method to format the timestamp on query
+        get: (timestamp) => dateFormat(timestamp),
+      },
+    },
+    {
+      toJSON: {
+        getters: true,
+      },
+      id: false,
+    }
+  );
 
 const thoughtSchema = new Schema(
     {
@@ -17,7 +53,10 @@ const thoughtSchema = new Schema(
             type: String,
             required: true
         },
-        reactions: [reactionSchema],
+        reactions: {
+            type: [reactionSchema],
+            default: []
+        }
     },
     {
         toJSON: {
@@ -25,34 +64,6 @@ const thoughtSchema = new Schema(
             getters: true
         },
         id: false,
-    }
-);
-
-const reactionSchema = new Schema (
-    {
-        reactionId: {
-            type: Schema.Types.ObjectId,
-            default: () => new Types.Object.id
-        },
-        reactionBody: {
-            type: String,
-            required: true,
-            maxlength: 280
-        },
-        username: {
-            type: String,
-            required: true
-        },
-        createdAt: {
-            type: Date,
-            default: Date.now,
-            get: (createdAtVal) => dateFormat(createdAtVal)
-        }
-    },
-    {
-        toJSON: {
-            getters: true
-        }
     }
 );
 
